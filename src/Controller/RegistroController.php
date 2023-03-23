@@ -8,8 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-// Hash password
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegistroController extends AbstractController
 {
@@ -17,16 +15,9 @@ class RegistroController extends AbstractController
     /**
      * @Route("/registro", name="app_registro")
      */
-    public function index(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function index(Request $request): Response
     {
         $user = new User();
-        // Init Password Hash
-        $plaintextPassword = '';
-        // Hash user Password
-        $hashPassword = $passwordHasher->hashPassword(
-            $user,
-            $plaintextPassword
-        );
         // Add Form
         $form = $this->createForm(UserType::class,$user);
         // Add Entity Manager
@@ -36,8 +27,6 @@ class RegistroController extends AbstractController
             // Set default props
             $user->setBan(false);
             $user->setRoles(['Role_user']);
-            // Set haspassword after success`s submit
-            $user->setPassword($hashPassword);
             // Manage Entity
             $em = $this->getDoctrine()->getManager();
             // Persist

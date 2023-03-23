@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PostsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -41,6 +43,22 @@ class Posts
      * @ORM\Column(type="string", length=80000)
      */
     private $contenido;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Comentarios::class, mappedBy="posts")
+     */
+    private $comentarios;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="post")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
+    public function __construct()
+    {
+        $this->comentarios = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -103,6 +121,48 @@ class Posts
     public function setContenido(string $contenido): self
     {
         $this->contenido = $contenido;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comentarios>
+     */
+    public function getComentarios(): Collection
+    {
+        return $this->comentarios;
+    }
+
+    public function addComentario(Comentarios $comentario): self
+    {
+        if (!$this->comentarios->contains($comentario)) {
+            $this->comentarios[] = $comentario;
+            $comentario->setPosts($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComentario(Comentarios $comentario): self
+    {
+        if ($this->comentarios->removeElement($comentario)) {
+            // set the owning side to null (unless already changed)
+            if ($comentario->getPosts() === $this) {
+                $comentario->setPosts(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

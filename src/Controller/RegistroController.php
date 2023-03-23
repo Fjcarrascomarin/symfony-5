@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use http\Client\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,7 +28,7 @@ class RegistroController extends AbstractController
             $user->setBan(false);
             $user->setRoles(['Role_user']);
             // Manage Entity
-            $em = $this->getDoctrine()->getManage();
+            $em = $this->getDoctrine()->getManager();
             // Persist
             $em->persist($user);
             // Clear exit buffer
@@ -36,7 +36,7 @@ class RegistroController extends AbstractController
             // Add Message
             $this->addFlash('success', 'Se añadió correctamente');
             // Redirect
-            return $this->redirectToRoute('registro');
+            return $this->redirectToRoute('app_registro');
         }
         // Render
         return $this->render('registro/index.html.twig', [

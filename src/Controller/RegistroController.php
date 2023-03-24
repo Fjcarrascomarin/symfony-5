@@ -36,8 +36,6 @@ class RegistroController extends AbstractController
                 $user,
                 $generatePassword
             );
-            $user->setBan(false);
-            $user->setRoles(['Role_user']);
             // Set haspassword after success`s submit
             $user->setPassword($hashPassword);
             // Manage Entity
@@ -47,7 +45,7 @@ class RegistroController extends AbstractController
             // Clear exit buffer
             $em->flush();
             // Add Message
-            $this->addFlash('success', 'Se añadió correctamente');
+            $this->addFlash('success', User::REGISTER_SUCCESS);
             // Redirect
             return $this->redirectToRoute('app_registro');
         }

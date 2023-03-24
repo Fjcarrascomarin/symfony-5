@@ -8,6 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+
 
 class PostController extends AbstractController
 {
@@ -25,7 +27,36 @@ class PostController extends AbstractController
 
         // Validate form
         if($form->isSubmitted() && $form->isValid()){
-            $user = $this->getUser();
+            $brochureFile = $form['photo']->getData();
+            /** @var UploadedFile $brochureFile */
+            $brochureFile = $form->get('photo')->getData();
+
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($brochureFile) {
+
+                // this is needed to safely include the file name as part of the URL
+                $originalFilename = pathinfo($brochureFile->getClientOriginalName(),PATHINFO_FILENAME);
+                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [\u0080-\uffff] remove',$originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $brochureFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $brochureFile->move(
+                        $this->getParameter('photos_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                    throw new \Exception("Ups!. Algo ha salido mal");
+                }
+            }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $post->setPhoto($newFilename);
+
+                $user = $this->getUser();
             $post->setUser($user);
             $em= $this->getDoctrine()->getManager();
             $em-> persist($post);

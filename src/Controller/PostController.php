@@ -27,22 +27,22 @@ class PostController extends AbstractController
 
         // Validate form
         if($form->isSubmitted() && $form->isValid()){
-            $brochureFile = $form['photo']->getData();
-            /** @var UploadedFile $brochureFile */
-            $brochureFile = $form->get('photo')->getData();
+            $photoFile = $form['photo']->getData();
+            /** @var UploadedFile $photoFile */
+            $photoFile = $form->get('photo')->getData();
 
             // this condition is needed because the 'brochure' field is not required
             // so the PDF file must be processed only when a file is uploaded
-            if ($brochureFile) {
+            if ($photoFile) {
 
                 // this is needed to safely include the file name as part of the URL
-                $originalFilename = pathinfo($brochureFile->getClientOriginalName(),PATHINFO_FILENAME);
+                $originalFilename = pathinfo($photoFile->getClientOriginalName(),PATHINFO_FILENAME);
                 $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [\u0080-\uffff] remove',$originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $brochureFile->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
 
                 // Move the file to the directory where brochures are stored
                 try {
-                    $brochureFile->move(
+                    $photoFile->move(
                         $this->getParameter('photos_directory'),
                         $newFilename
                     );

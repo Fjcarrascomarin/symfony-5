@@ -20,13 +20,7 @@ class RegistroController extends AbstractController
     public function index(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
-        // Init Password Hash
-        $plaintextPassword = '';
-        // Hash user Password
-        $hashPassword = $passwordHasher->hashPassword(
-            $user,
-            $plaintextPassword
-        );
+
         // Add Form
         $form = $this->createForm(UserType::class,$user);
         // Add Entity Manager
@@ -34,6 +28,14 @@ class RegistroController extends AbstractController
         // Submit and valid
         if($form->isSubmitted() && $form->isValid()) {
             // Set default props
+
+            // Init Password Hash
+            $generatePassword = $form->get('password')->getData();
+            // Hash user Password
+            $hashPassword = $passwordHasher->hashPassword(
+                $user,
+                $generatePassword
+            );
             $user->setBan(false);
             $user->setRoles(['Role_user']);
             // Set haspassword after success`s submit

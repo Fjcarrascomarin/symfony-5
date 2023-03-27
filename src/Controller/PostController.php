@@ -70,4 +70,24 @@ class PostController extends AbstractController
             'formularioPost' => $form->createView()
         ]);
     }
+
+    /**
+     * @Route("/post/{id}", name="app_post")
+     */
+    public function verPost($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $post = $em->getRepository(Posts::class)->find($id);
+        return $this->render('post/verPost.html.twig',['post'=>$post]);
+    }
+
+    /**
+     * @Route("/own-post", name="MisPost")
+     */
+    public function MisPost(){
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $post = $em->getRepository(Posts::class)->findBy(['user'=>$user]);
+        return $this->render('post/own-post.html.twig',['post'=>$post]);
+    }
 }

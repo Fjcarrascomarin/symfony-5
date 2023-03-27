@@ -6,6 +6,7 @@ use App\Repository\PostsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @ORM\Entity(repositoryClass=PostsRepository::class)
@@ -30,7 +31,7 @@ class Posts
     private $likes;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $photo;
 
@@ -51,14 +52,47 @@ class Posts
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="post")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
+    /**
+     * @return mixed
+     */
+    public function getComentarios()
+    {
+        return $this->comentarios;
+    }
+
+    /**
+     * @param mixed $comentarios
+     */
+    public function setComentarios($comentarios): void
+    {
+        $this->comentarios = $comentarios;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user): void
+    {
+        $this->user = $user;
+    }
+
     public function __construct()
     {
-        $this->comentarios = new ArrayCollection();
+        $this->likes='';
+        $this->publication_date = new \DateTime();
     }
+
 
     public function getId(): ?int
     {
@@ -125,45 +159,5 @@ class Posts
         return $this;
     }
 
-    /**
-     * @return Collection<int, Comentarios>
-     */
-    public function getComentarios(): Collection
-    {
-        return $this->comentarios;
-    }
 
-    public function addComentario(Comentarios $comentario): self
-    {
-        if (!$this->comentarios->contains($comentario)) {
-            $this->comentarios[] = $comentario;
-            $comentario->setPosts($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComentario(Comentarios $comentario): self
-    {
-        if ($this->comentarios->removeElement($comentario)) {
-            // set the owning side to null (unless already changed)
-            if ($comentario->getPosts() === $this) {
-                $comentario->setPosts(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
 }
